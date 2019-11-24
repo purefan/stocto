@@ -1,0 +1,18 @@
+{
+  "name": "stocto",
+  "version": "1.0.0",
+  "description": "Chess client for Resker",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "$(npm bin)/forever start forever.json"
+  },
+  "author": "Miguel Espinoza",
+  "license": "ISC",
+  "dependencies": {
+    "chess.js": "^0.10.2",
+    "debug": "^4.1.1",
+    "forever": "^1.0.0",
+    "node-uci": "^1.3.1"
+  }
+}
