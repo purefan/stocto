@@ -1,0 +1,11 @@
+version: '2.1'
+services:
+  stocto:
+    build: .
+    container_name: stocto-app
+    hostname: stocto-app
+    environment:
+      - DEBUG=*
+      - RESKER_HOST=${RESKER_HOST:-SomeHost}
+      - X_API_KEY=${X_API_KEY:-SomeKey}
+    command: ["sh", "-c" ,"npm run start && printenv && tail -f /dev/null"]
