@@ -1,4 +1,4 @@
-const debug = require('debug')('matt')
+const debug = require('debug')('stocto')
 const path = require('path')
 const http = require('./http')
 const { Engine } = require('node-uci')
@@ -9,10 +9,11 @@ const os = require('os');
 
 
 async function get_queued_position() {
-    debug('getting queued position')
+    const log = debug.extend('get_queued_position')
+    log('getting queued position')
     const res = await http({
-        protocol: 'http:',
-        hostname: process.env.RESKER_HOST,
+
+        host: process.env.RESKER_HOST,
         port: process.env.RESKER_PORT,
         method: 'get',
         path: '/position/analysis/queue',
@@ -22,9 +23,18 @@ async function get_queued_position() {
         }
     })
     try {
-        const position = JSON.parse(res.body)
-        debug('position %O', position)
-        return position
+        log('res %O', res)
+        if (res.statusCode == 401) {
+            log('Unauthorized')
+        }
+        if (res.body == 'Wrong api key') {
+            log(res.body)
+        } else {
+            const position = JSON.parse(res.body)
+            debug('position %O', position)
+            return position
+        }
+
     } catch (err) {
         return {}
     }
@@ -34,8 +44,8 @@ async function get_queued_position() {
 async function reserve_position(fen) {
     debug('reserving position')
     const res = await http({
-        protocol: 'http:',
-        hostname: process.env.RESKER_HOST,
+
+        host: process.env.RESKER_HOST,
         port: process.env.RESKER_PORT,
         path: '/position/status',
         method: 'put',
@@ -54,8 +64,8 @@ async function reserve_position(fen) {
 async function store_analysis(analysis) {
     debug('Storing analysis')
     await http({
-        protocol: 'http:',
-        hostname: process.env.RESKER_HOST,
+
+        host: process.env.RESKER_HOST,
         port: process.env.RESKER_PORT,
         method: 'post',
         path: '/position/analysis',
@@ -70,9 +80,10 @@ async function store_analysis(analysis) {
 
 
 (async () => {
+    console.log('[main] init')
     // preparations
     await uci.init()
-    debug('engine id', uci.id)
+    console.log('[main] engine id', uci.id)
     await uci.setoption('Skill Level', '20')
     await uci.setoption('Threads', os.cpus().length) // Use every core we have
     let position

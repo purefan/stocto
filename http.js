@@ -1,12 +1,10 @@
 const log = require('debug')('stocto:http')
-const http = require('http')
+const http = require('https')
 const defaults = {
     headers: {},
-    hostname: 'localhost',
     protocol: 'https:',
     method: 'GET',
     port: 443
-    // , path: '/somewhere'
 }
 
 module.exports = args => {
