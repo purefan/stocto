@@ -12,15 +12,8 @@ async function get_queued_position() {
     const log = debug.extend('get_queued_position')
     log('getting queued position')
     const res = await http({
-
-        host: process.env.RESKER_HOST,
-        port: process.env.RESKER_PORT,
         method: 'get',
-        path: '/position/analysis/queue',
-        headers: {
-            'x-api-key': process.env.X_API_KEY || '894hmt3x489ht89p3x',
-            'content-type': 'application/json'
-        }
+        path: '/position/analysis/queue'
     })
     try {
         log('res %O', res)
@@ -44,15 +37,8 @@ async function get_queued_position() {
 async function reserve_position(fen) {
     debug('reserving position')
     const res = await http({
-
-        host: process.env.RESKER_HOST,
-        port: process.env.RESKER_PORT,
         path: '/position/status',
         method: 'put',
-        headers: {
-            'x-api-key': process.env.X_API_KEY || '894hmt3x489ht89p3x',
-            'content-type': 'application/json'
-        },
         body: {
             status: 1,
             fen: fen
@@ -64,15 +50,8 @@ async function reserve_position(fen) {
 async function store_analysis(analysis) {
     debug('Storing analysis')
     await http({
-
-        host: process.env.RESKER_HOST,
-        port: process.env.RESKER_PORT,
         method: 'post',
         path: '/position/analysis',
-        headers: {
-            'content-type': 'application/json',
-            'x-api-key': process.env.X_API_KEY || '894hmt3x489ht89p3x'
-        },
         body: analysis
     })
 }

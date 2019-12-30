@@ -1,10 +1,15 @@
 const log = require('debug')('stocto:http')
 const http = require('https')
 const defaults = {
-    headers: {},
+    headers: {
+        'x-api-key': process.env.X_API_KEY || '894hmt3x489ht89p3x',
+        'content-type': 'application/json',
+        resker_client: process.env.STOCTO_CLIENT_NAME || os.hostname() || 'stocto-app'
+    },
     protocol: 'https:',
-    method: 'GET',
-    port: 443
+    host: process.env.RESKER_HOST,
+    port: process.env.RESKER_PORT || 443,
+    method: 'GET'
 }
 
 module.exports = args => {
