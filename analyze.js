@@ -13,7 +13,8 @@ async function get_queued_position() {
     log('getting queued position')
     const res = await http({
         method: 'get',
-        path: '/position/analysis/queue'
+        path: '/position/analysis/queue',
+        expected_status_code: 200
     })
     try {
         log('res %O', res)
@@ -38,7 +39,8 @@ async function reserve_position(fen) {
     debug('reserving position')
     const res = await http({
         path: '/position/status',
-        method: 'put',
+        expected_status_code: 200,
+        method: 'PUT',
         body: {
             status: 1,
             fen: fen
@@ -52,7 +54,8 @@ async function store_analysis(analysis) {
     await http({
         method: 'post',
         path: '/position/analysis',
-        body: analysis
+        body: analysis,
+        expected_status_code: 200
     })
 }
 

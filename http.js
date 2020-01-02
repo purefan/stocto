@@ -16,22 +16,32 @@ const defaults = {
 module.exports = args => {
     return new Promise((resolve, reject) => {
         let body = args.body || false
-        if (args.body) delete args.body
+        if (args.body) {
+            delete args.body
+        }
 
         const req_args = Object.assign(defaults, args)
         // https://github.com/dherault/serverless-offline/issues/610
         if (req_args.method.toLowerCase() == 'get') {
             req_args.headers[ 'Content-Length' ] = 0
         }
-        log('[HTTP] req_args', req_args)
-        log('[HTTP] body', body)
+
+        if (body) {
+            req_args.headers[ 'Content-Length' ] = JSON.stringify(body).length
+            log('Set content-length to %d', req_args.headers[ 'Content-Length' ])
+        }
+
+        log('req_args %O', req_args)
+        log('body %O', body)
         const req = http.request(req_args, res => {
             let body = ''
             res.on('data', data => (body += data))
             res.on('error', err => reject(err))
             res.on('end', () => {
                 if (args.expected_status_code && res.statusCode != args.expected_status_code) {
-                    throw new Error(`HTTP request did not return (${res.statusCode}) the expected status code (${args.expected_status_code}):  ${body.toString()}`)
+                    const error_message = `HTTP request did not return (${res.statusCode}) the expected status code (${args.expected_status_code}):  "${body.toString()}"`
+                    log(error_message)
+                    throw new Error(error_message)
                 }
                 const resolver = Object.assign({ statusCode: res.statusCode, body: body }, res.headers)
                 resolve(resolver)
@@ -42,15 +52,19 @@ module.exports = args => {
                 .filter(header => typeof args.headers[ header ] != 'undefined')
                 .forEach(header => req.setHeader(header, args.headers[ header ]))
         }
-
-        if (body) {
-            req.write(JSON.stringify(body), 'utf8')
-        }
-        req.end()
-
         req.on('error', err => {
             log('Error %O', err)
             reject(err)
         })
+
+        if (body) {
+            log('Sending the body as %s', JSON.stringify(body))
+            req.write(JSON.stringify(body))
+            req.end()
+        }
+        else {
+            log('No body to send')
+            req.end()
+        }
     })
 }
