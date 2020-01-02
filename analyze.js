@@ -5,7 +5,7 @@ const { Engine } = require('node-uci')
 const uci = new Engine(path.join(__dirname, 'stockfish_10_x64'))
 const Chess = require('chess.js').Chess
 let chess = new Chess()
-const os = require('os');
+const os = require('os')
 
 
 async function get_queued_position() {

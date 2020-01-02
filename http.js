@@ -1,5 +1,6 @@
 const log = require('debug')('stocto:http')
 const http = require('https')
+const os = require('os')
 const defaults = {
     headers: {
         'x-api-key': process.env.X_API_KEY || '894hmt3x489ht89p3x',
