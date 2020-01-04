@@ -96,7 +96,7 @@ async function do_analysis(position) {
     await uci.sendCmd(`position fen ${position.fen}`)
     await uci.isready()
     const out = await uci.go({ depth: position.depth_goal || 40 })
-    const good_ones = out.info.filter(record => record.score)
+    const good_ones = out.info.filter(record => record.score && record.depth && (record.depth % 5 == 0 || record.depth == position.depth_goal))
     // Prepare to add analysis
     const analysis = {
         fen: position.fen,
