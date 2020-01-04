@@ -109,9 +109,10 @@ async function do_analysis(position) {
         steps: good_ones,
     }
     // Find the score for the bestmove
-    // First, find the record for the bestmove
-    analysis.score = good_ones.find(record => record.pv.split(' ').reverse().pop() == out.bestmove).score.value
-    // Find the good infos
+    analysis.score = out.info
+        .filter(record => record.score) // they must have a score
+        .find(record => record.pv.split(' ').reverse().pop() == out.bestmove) // they must match the bestmove
+        .score.value
     return analysis
 }
 
