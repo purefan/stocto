@@ -1,6 +1,6 @@
 {
     "uid": "stocto",
     "append": true,
-    "watch": true,
+    "watch": false,
     "script": "analyze.js"
 }
