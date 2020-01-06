@@ -6,6 +6,7 @@ const uci = new Engine(path.join(__dirname, 'stockfish_10_x64'))
 const Chess = require('chess.js').Chess
 let chess = new Chess()
 const os = require('os')
+const fs = require('fs')
 
 
 async function get_queued_position() {
@@ -86,7 +87,9 @@ async function store_analysis(analysis) {
         }
         await sleep(30000)
 
-    } while (true)
+    } while (!fs.existsSync('./stop'))
+    debug('Nothing left to do')
+    uci.quit()
 })()
 
 async function do_analysis(position) {
