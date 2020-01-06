@@ -78,7 +78,7 @@ async function store_analysis(analysis) {
             debug('Reserving position')
             await reserve_position(position.fen)
             analysis = await do_analysis(position)
-            debug('Analysis %O', analysis)
+            debug('Partial analysis %O', { fen: analysis.fen, depth: analysis.depth, multipv: analysis.multipv, best_move: analysis.best_move })
             await store_analysis(analysis)
             debug('Success!')
         } else {
