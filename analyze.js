@@ -18,7 +18,8 @@ async function get_queued_position() {
         expected_status_code: 200
     })
     try {
-        log('res %O', res)
+        log('status_code: %s', res.statusCode)
+        log('Body', Object.assign({}, JSON.parse(res.body), { analysis: '...possibly long...' }))
         if (res.statusCode == 401) {
             log('Unauthorized')
         }
@@ -59,8 +60,6 @@ async function store_analysis(analysis) {
         expected_status_code: 200
     })
 }
-
-
 
 (async () => {
     console.log('[main] init')

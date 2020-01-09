@@ -32,7 +32,7 @@ module.exports = args => {
         }
 
         log('req_args %O', req_args)
-        log('body %O', body)
+        log('limited body %s', JSON.stringify(body).substr(0, 300))
         const req = http.request(req_args, res => {
             let body = ''
             res.on('data', data => (body += data))
@@ -58,7 +58,8 @@ module.exports = args => {
         })
 
         if (body) {
-            log('Sending the body as %s', JSON.stringify(body))
+            log('Sending the body as %s', JSON.stringify(body).substr(0, 300))
+            log('Body has %s chars', JSON.stringify(body).length)
             req.write(JSON.stringify(body))
             req.end()
         }
