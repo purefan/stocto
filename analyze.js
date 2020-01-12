@@ -65,27 +65,38 @@ async function store_analysis(analysis) {
     console.log('[main] init')
     // preparations
     await uci.init()
-    console.log('[main] engine id', uci.id)
+    debug('[main] engine id', uci.id)
     await uci.setoption('Skill Level', '20')
     await uci.setoption('Threads', os.cpus().length) // Use every core we have
     let position
     let analysis
     do {
-        // get a queued position
-        position = await get_queued_position()
-        debug('Got position ' + position.fen)
-        if (position.fen) {
-            debug('Reserving position')
-            await reserve_position(position.fen)
-            analysis = await do_analysis(position)
-            debug('Partial analysis %O', { fen: analysis.fen, depth: analysis.depth, multipv: analysis.multipv, best_move: analysis.best_move })
-            await store_analysis(analysis)
-            debug('Success!')
-        } else {
-            debug('No position found')
-        }
-        await sleep(30000)
+        try {
+            // get a queued position
+            position = await get_queued_position()
+            debug('Got position ' + position.fen)
+            if (position.fen) {
+                debug('Reserving position')
+                await reserve_position(position.fen)
+                analysis = await do_analysis(position)
+                debug('Partial analysis %O', { fen: analysis.fen, depth: analysis.depth, multipv: analysis.multipv, best_move: analysis.best_move })
+                await store_analysis(analysis)
+                debug('Success!')
+            } else {
+                debug('No position found')
+            }
 
+        } catch (error) {
+            if (error.toString().includes('socket hang up')) {
+                debug('[Error] cannot connect to Resker')
+            } else {
+                debug('[Error]', error)
+            }
+        }
+        finally {
+            debug('Sleeping for 30 secods at ', new Date())
+            await sleep(30000)
+        }
     } while (!fs.existsSync('./stop'))
     debug('Nothing left to do')
     uci.quit()
