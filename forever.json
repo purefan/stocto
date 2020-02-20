@@ -2,5 +2,6 @@
     "uid": "stocto",
     "append": true,
     "watch": false,
-    "script": "analyze.js"
+    "script": "analyze.js",
+    "minUptime": 1000
 }
