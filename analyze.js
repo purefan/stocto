@@ -1,7 +1,8 @@
 const debug = require('debug')('stocto:analyze')
 const path = require('path')
+const settings = require('./package.json').settings
 const { Engine } = require('node-uci')
-const uci = new Engine(path.join(__dirname, 'bin', 'stockfish_10_x64'))
+const uci = new Engine(path.join(__dirname, 'bin', settings.stockfish_exec))
 const os = require('os')
 const fs = require('fs')
 const Stocto = require('./lib/stocto')

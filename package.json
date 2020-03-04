@@ -9,6 +9,9 @@
   },
   "author": "Miguel Espinoza",
   "license": "ISC",
+  "settings": {
+    "stockfish_exec": "stockfish_20011801_x64_modern"
+  },
   "dependencies": {
     "chess.js": "^0.10.2",
     "debug": "^4.1.1",
