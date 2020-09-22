@@ -8,17 +8,46 @@ const fs = require('fs')
 const Stocto = require('./lib/stocto')
 const stocto = new Stocto({ uci })
 
+let stop_now = false
+
+process.on('SIGINT', () => {
+    console.log('Stopping, heard SIGINT')
+    setTimeout(() => {
+        console.log('Now setting stop_now to true')
+        stop_now = true
+    }, 10000)
+
+})
+
+/**
+ * @todo Store analysis and re-try if fail to POST
+ * @todo Websocket and stream progress engine
+ */
 async function run() {
     console.log('[main] init')
+    if (!process.env.X_API_KEY || process.env.X_API_KEY.length < 8) {
+        throw new Error('API KEY is too short or invalid')
+    }
     // preparations
     await stocto.uci.init()
     debug('[main] engine id', stocto.uci.id)
     await stocto.uci.setoption('Skill Level', '20')
+    debug('Skill level set')
     await stocto.uci.setoption('Threads', os.cpus().length) // Use every core we have
+    debug('Threads set to ' + os.cpus().length)
     let position
     let analysis
-    do {
+    let stored_analysis
+    debug('Stop_now is ' + (stop_now == true ? 'true' : 'false)'))
+
+    while (stop_now != true) {
         try {
+            debug('Trying')
+            stored_analysis = stocto.pop_local_analysis()
+            if (stored_analysis) {
+                debug('There is a stored analysis')
+                await stocto.store_analysis_in_resker(stored_analysis)
+            }
             // get a queued position
             position = await stocto.get_queued_position()
             debug('Got position ' + position.fen)
@@ -27,7 +56,7 @@ async function run() {
                 await stocto.reserve_position(position.fen)
                 analysis = await stocto.do_analysis(position)
                 debug('Partial analysis %O', { fen: analysis.fen, depth: analysis.depth, multipv: analysis.multipv, best_move: analysis.best_move })
-                await stocto.store_analysis(analysis)
+                await stocto.store_analysis_in_resker(analysis)
                 debug('Success!')
             } else {
                 debug('No position found')
@@ -42,10 +71,14 @@ async function run() {
         }
         finally {
             debug('Sleeping for 30 secods at ', new Date())
+            if (fs.existsSync('./stop')) {
+                debug('Setting stop = true before sleeping')
+                stop_now = true
+            }
             await stocto.sleep(30000)
         }
-    } while (!fs.existsSync('./stop'))
+    }
     debug('Nothing left to do')
-    stocto.uci.quit()
+    await stocto.uci.quit()
 }
 run()
