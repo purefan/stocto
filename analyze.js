@@ -24,11 +24,14 @@ process.on('SIGINT', () => {
  * @todo Websocket and stream progress engine
  */
 async function run() {
-    console.log('[main] init')
+    debug('[main] init')
+    debug('Resker host: ' + process.env.RESKER_HOST)
+
     if (!process.env.X_API_KEY || process.env.X_API_KEY.length < 8) {
         throw new Error('API KEY is too short or invalid')
     }
     // preparations
+    debug('going to run init')
     await stocto.uci.init()
     debug('[main] engine id', stocto.uci.id)
     await stocto.uci.setoption('Skill Level', '20')
@@ -79,6 +82,13 @@ async function run() {
         }
     }
     debug('Nothing left to do')
-    await stocto.uci.quit()
+    try {
+        await stocto.uci.quit()
+        debug('Stopped uci')
+    } catch (error) {
+        debug('Something failed but uci should be stopped now')
+    } finally {
+        debug('Ending.')
+    }
 }
 run()
