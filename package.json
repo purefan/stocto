@@ -4,13 +4,13 @@
   "description": "Chess client for Resker",
   "main": "index.js",
   "scripts": {
-    "test": "DEBUG=stocto*,nock* RESKER_HOST=localhost mocha",
+    "test": "DEBUG=stocto*,nock* RESKER_HOST=localhost RESKER_PORT=8001 mocha --watch",
     "start": "$(npm bin)/forever start forever.json"
   },
   "author": "Miguel Espinoza",
   "license": "ISC",
   "settings": {
-    "stockfish_exec": "stockfish_20011801_x64_modern"
+    "stockfish_exec": "stockfish_13_linux_x64_avx2"
   },
   "dependencies": {
     "chess.js": "^0.10.2",
