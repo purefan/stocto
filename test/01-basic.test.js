@@ -1,3 +1,4 @@
+process.env.RESKER_PROTO = 'http:'
 const { Engine } = require('node-uci')
 const settings = require('../package.json').settings
 const path = require('path')
@@ -13,7 +14,7 @@ const assert = require('assert')
 describe('0 - API Key', function () {
     const log = debug.extend('api_key')
 
-    before('Init stockfish', async () => {
+    beforeAll(async () => {
         log('Initializing stockfish')
         await stocto.uci.init()
         await stocto.uci.ucinewgame()
@@ -23,20 +24,23 @@ describe('0 - API Key', function () {
         log('Finished initializing stockfish')
     })
 
-    after('Stop stockfish', async () => {
-        log('Stopping stockfish')
+    afterAll(async () => {
+        log('Stopping stockfish', stocto.proc)
         await stocto.uci.quit()
         log('Finished stopping stockfish')
     })
 
     it('Invalid key fails', async function () {
+        expect.assertions(1)
         const intercept_url = `${http.defaults.protocol}//${http.defaults.host}:${http.defaults.port}`
+
         nock(intercept_url)
             .get('/position/analysis/queue')
             .reply(401)
 
-        const res = await stocto.get_queued_position()
-        assert(res.statusCode === 401, 'Incorrect status code')
+        return expect(stocto.get_queued_position())
+            .rejects
+            .toEqual('HTTP request did not return (401) the expected status code (200): ""')
     })
 
     it('Analysis has a valid structure', async () => {
