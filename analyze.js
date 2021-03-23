@@ -53,7 +53,15 @@ async function run() {
             }
             // get a queued position
             position = await stocto.get_queued_position()
+            if (!position.fen && position.id) {
+                position.fen = position.id
+            }
+            if (!position.fen && position._id) {
+                position.fen = position._id
+            }
+
             debug('Got position ' + position.fen)
+
             if (position.fen) {
                 debug('Reserving position')
                 await stocto.reserve_position(position.fen)
@@ -62,7 +70,7 @@ async function run() {
                 await stocto.store_analysis_in_resker(analysis)
                 debug('Success!')
             } else {
-                debug('No position found')
+                debug('No position found', position)
             }
 
         } catch (error) {
@@ -73,12 +81,12 @@ async function run() {
             }
         }
         finally {
-            debug('Sleeping for 30 secods at ', new Date())
+            debug('Sleeping for 15 secods at ', new Date())
             if (fs.existsSync('./stop')) {
                 debug('Setting stop = true before sleeping')
                 stop_now = true
             }
-            await stocto.sleep(30000)
+            await stocto.sleep(15000)
         }
     }
     debug('Nothing left to do')
