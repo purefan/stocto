@@ -32,12 +32,20 @@ async function run() {
     }
     // preparations
     debug('going to run init')
+
     await stocto.uci.init()
     debug('[main] engine id', stocto.uci.id)
+
     await stocto.uci.setoption('Skill Level', '20')
     debug('Skill level set')
-    await stocto.uci.setoption('Threads', os.cpus().length) // Use every core we have
+
+    await stocto.uci.setoption('Threads', os.cpus().length - 2) // Use every core we have
     debug('Threads set to ' + os.cpus().length)
+
+    await stocto.uci.setoption('Hash', 3072 * 3) // hashfull 1000 with 3GBs, increasing because I can
+    debug('Hash set to 9GBs')
+
+
     let position
     let analysis
     let stored_analysis
@@ -74,7 +82,7 @@ async function run() {
             }
 
         } catch (error) {
-            if (error.toString().includes('socket hang up')) {
+            if (error && error.toString() && error.toString().includes('socket hang up')) {
                 debug('[Error] cannot connect to Resker')
             } else {
                 debug('[Error]', error)
